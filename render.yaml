@@ -1,11 +1,11 @@
 services:
   - type: web
-    name: rag
+    name: rag_service
     env: python
     branch: main
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: python rag_service.py
+    startCommand: python rag.py
     envVars:
       - key: YANDEX_TOKEN
         sync: false
