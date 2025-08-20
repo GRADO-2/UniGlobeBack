@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: rag-service
+    name: rag
     env: python
     branch: main
     plan: free
