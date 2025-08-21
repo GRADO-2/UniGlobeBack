@@ -1,6 +1,7 @@
-fastapi
-uvicorn[standard]
-sentence-transformers
-faiss-cpu
-yandex-cloud-ml-sdk
-langchain
+fastapi==0.115.0
+uvicorn==0.30.6
+faiss-cpu==1.7.4
+sentence-transformers==2.2.2
+google-cloud-storage==2.18.2
+yandex-cloud-ml-sdk==0.1.0
+pydantic==1.10.15
