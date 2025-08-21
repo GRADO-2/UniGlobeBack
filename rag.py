@@ -14,6 +14,12 @@ BUCKET_NAME = "rag-vectorstore-1755763542"
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 TOP_K = 3
 
+# Variables globales que se inicializarán después
+index = None
+metadata = None
+model = None
+yc_model = None
+
 # Configurar autenticación de Google Cloud
 if "GOOGLE_CREDENTIALS_JSON" in os.environ:
     creds_json = os.environ["GOOGLE_CREDENTIALS_JSON"]
@@ -50,24 +56,39 @@ def load_vectorstore():
         print("Vectorstore cargado exitosamente!")
         return index, metadata
 
-# Cargar al iniciar la app
-print("Iniciando carga de vectorstore...")
-index, metadata = load_vectorstore()
-model = SentenceTransformer(MODEL_NAME)
-
-# Configuración de Yandex
-token = os.getenv("YANDEX_TOKEN")
-sdk = YCloudML(folder_id="b1go6qinn0muj8gb8k4o", auth=token)
-yc_model = sdk.models.completions("yandexgpt-32k", model_version="latest")
-yc_model = yc_model.configure(temperature=0.3)
+def initialize_app():
+    """Inicializar todos los componentes de la app"""
+    global index, metadata, model, yc_model
+    
+    print("Iniciando carga de vectorstore...")
+    index, metadata = load_vectorstore()
+    model = SentenceTransformer(MODEL_NAME)
+    
+    # Configuración de Yandex
+    token = os.getenv("YANDEX_TOKEN")
+    if token:
+        sdk = YCloudML(folder_id="b1go6qinn0muj8gb8k4o", auth=token)
+        yc_model = sdk.models.completions("yandexgpt-32k", model_version="latest")
+        yc_model = yc_model.configure(temperature=0.3)
+        print("Yandex GPT configurado exitosamente!")
+    else:
+        print("⚠️  YANDEX_TOKEN no encontrado")
 
 app = FastAPI()
+
+# Event handler para inicializar al startup
+@app.on_event("startup")
+async def startup_event():
+    initialize_app()
 
 class QuestionRequest(BaseModel):
     question: str
     top_k: int = TOP_K
 
 def query_rag(question, k=TOP_K):
+    if index is None or metadata is None:
+        return "Error: Vectorstore no cargado"
+    
     q_emb = model.encode([question], convert_to_numpy=True)
     D, I = index.search(q_emb, k)
     context = ""
@@ -77,6 +98,9 @@ def query_rag(question, k=TOP_K):
     return context
 
 def ask_yandex(question):
+    if yc_model is None:
+        return "Error: Yandex GPT no configurado"
+    
     context = query_rag(question)
     behavior = """
     You are an expert assistant specialized in topics related to settling abroad as an international student.
@@ -94,6 +118,16 @@ def ask_yandex(question):
 @app.get("/")
 def root():
     return {"status": "RAG + Yandex GPT service running"}
+
+@app.get("/health")
+def health_check():
+    """Endpoint para verificar el estado de la app"""
+    status = {
+        "vectorstore_loaded": index is not None,
+        "model_loaded": model is not None,
+        "yandex_configured": yc_model is not None
+    }
+    return status
 
 @app.post("/ask")
 def ask(req: QuestionRequest):
