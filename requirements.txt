@@ -8,7 +8,7 @@ google-cloud-storage==2.16.0
 torch>=2.0.0
 transformers>=4.40.0
 sentence-transformers==2.2.2
-faiss-cpu==1.7.4
+faiss-cpu==1.7.4.post2   # ✅ wheel precompilada, no compila nada
 
 # Validación de datos
 pydantic==1.10.15
