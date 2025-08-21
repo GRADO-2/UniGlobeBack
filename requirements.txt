@@ -1,9 +1,10 @@
 fastapi==0.111.0
 uvicorn[standard]==0.30.1
 pydantic==2.7.1
-faiss-cpu==1.7.4.post2
+faiss-cpu==1.12.0
 numpy>=1.26.0
 google-cloud-storage==2.16.0
 sentence-transformers==2.2.2
 yandex-cloud-ml-sdk==0.2.0
+
 
