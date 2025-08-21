@@ -1,7 +1,22 @@
-fastapi==0.115.0
-uvicorn==0.30.6
-faiss-cpu==1.7.4
+fastapi==0.111.0
+uvicorn[standard]==0.30.1
+
+# Google Cloud
+google-cloud-storage==2.16.0
+
+# NLP + FAISS
+torch>=2.0.0
+transformers>=4.40.0
 sentence-transformers==2.2.2
-google-cloud-storage==2.18.2
-yandex-cloud-ml-sdk==0.1.0
+faiss-cpu==1.7.4
+
+# Validación de datos
 pydantic==1.10.15
+
+# SDK de Yandex
+yandex-cloud-ml-sdk==0.1.0
+
+# Dependencias útiles
+numpy>=1.25.0
+scikit-learn>=1.3.0
+scipy>=1.11.0
