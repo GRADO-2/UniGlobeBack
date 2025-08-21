@@ -1,11 +1,12 @@
 services:
   - type: web
-    name: rag_service
+    name: rag-yandex-service
     env: python
-    branch: main
     plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: python rag.py
     envVars:
       - key: YANDEX_TOKEN
+        sync: false
+      - key: GOOGLE_CREDENTIALS_JSON
         sync: false
